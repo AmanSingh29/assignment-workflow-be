@@ -5,6 +5,8 @@ const app = express();
 const apiRoutes = require("./routes");
 const globalErrorHandlerMw = require("./middlewares/globalErrorHandler");
 
+app.use(express.json());
+
 // DB connection
 connectDB();
 

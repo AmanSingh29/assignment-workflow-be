@@ -5,7 +5,7 @@ const { AppError } = require("../utils/appError");
 const connectDB = async () => {
   try {
     await mongoose.connect(MONGODB_URI);
-    console.log("----------Database connected----------");
+    console.log("---------- Database connected ----------");
   } catch (error) {
     throw new AppError(`Err in connecting DB: ${error.message}`, 500);
   }
