@@ -1,10 +1,14 @@
 const { celebrate, Joi, Segments } = require("celebrate");
+const { USER_ROLES } = require("../constants");
 
 const signupValidator = celebrate({
   [Segments.BODY]: Joi.object({
     name: Joi.string().min(2).max(50).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
+    role: Joi.string()
+      .required()
+      .valid(...Object.values(USER_ROLES)),
   }).required(),
 });
 

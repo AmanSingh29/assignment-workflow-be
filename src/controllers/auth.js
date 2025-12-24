@@ -3,13 +3,13 @@ const { generateToken } = require("../utils/jwt");
 const { UserModel } = require("../models");
 
 async function handleSignup(req, res, next) {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   const existingUser = await UserModel.findOne({ email });
   if (existingUser) {
     throw new AppError("User already exists", 409);
   }
 
-  const user = await new UserModel({ name, email, password }).save();
+  const user = await new UserModel({ name, email, password, role }).save();
   const token = generateToken(user);
   res.data = {
     statusCode: 201,

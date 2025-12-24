@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      default: USER_ROLES.USER,
+      required: true,
     },
   },
   {
