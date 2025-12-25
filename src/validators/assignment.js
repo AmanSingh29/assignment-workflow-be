@@ -1,4 +1,5 @@
 const { celebrate, Joi, Segments } = require("celebrate");
+const { ASSIGNMENT_STATUS, SORT_ORDER } = require("../constants");
 
 const createAssignmentValidator = celebrate({
   [Segments.BODY]: Joi.object({
@@ -14,7 +15,23 @@ const publishAssignmentValidator = celebrate({
   }),
 });
 
+const listAssignmentsValidator = celebrate({
+  [Segments.QUERY]: Joi.object({
+    status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)),
+    page: Joi.number().min(1).default(1),
+    limit: Joi.number().min(1).max(100).default(10),
+    sortBy: Joi.string()
+      .valid("created_at", "updated_at", "due_date")
+      .default("created_at"),
+    sortOrder: Joi.string()
+      .valid(...Object.values(SORT_ORDER))
+      .default(SORT_ORDER.DESCENDING),
+    search: Joi.string().min(3).max(50),
+  }),
+});
+
 module.exports = {
   createAssignmentValidator,
   publishAssignmentValidator,
+  listAssignmentsValidator,
 };

@@ -14,8 +14,14 @@ const ENV = {
   PRODUCTION: "production",
 };
 
+const SORT_ORDER = {
+  ASCENDING: "asc",
+  DESCENDING: "desc",
+};
+
 module.exports = {
   USER_ROLES,
   ENV,
   ASSIGNMENT_STATUS,
+  SORT_ORDER,
 };

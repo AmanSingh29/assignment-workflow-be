@@ -1,3 +1,4 @@
+const { listAssignmentsService } = require("../services/assignment.service");
 const { publishAssignmentService } = require("../services/assignment.service");
 const { createAssignmentService } = require("../services/assignment.service");
 
@@ -31,7 +32,23 @@ async function publishAssignment(req, res, next) {
   next();
 }
 
+async function listAssignments(req, res, next) {
+  const result = await listAssignmentsService({
+    user: req.user,
+    ...req.query,
+  });
+
+  res.data = {
+    statusCode: 200,
+    message: "Assignments fetched successfully",
+    ...result,
+  };
+
+  next();
+}
+
 module.exports = {
   createAssignment,
   publishAssignment,
+  listAssignments,
 };

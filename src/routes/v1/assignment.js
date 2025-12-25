@@ -7,12 +7,22 @@ const { USER_ROLES } = require("../../constants");
 const {
   createAssignment,
   publishAssignment,
+  listAssignments,
 } = require("../../controllers/assignment");
 const {
   createAssignmentValidator,
   publishAssignmentValidator,
+  listAssignmentsValidator,
 } = require("../../validators/assignment");
 const router = express.Router();
+
+router.get(
+  "/",
+  authenticateUser,
+  listAssignmentsValidator,
+  asyncHandler(listAssignments),
+  sendResponse
+);
 
 router.post(
   "/create",
