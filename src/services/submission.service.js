@@ -33,6 +33,26 @@ async function submitAssignmentService({ assignmentId, answer, user }) {
   return submission;
 }
 
+async function getSubmissionsByAssignmentService({ assignmentId, user }) {
+  const assignment = await AssignmentModel.findById(assignmentId);
+  if (!assignment) {
+    throw new AppError("Assignment not found", 404);
+  }
+
+  if (assignment.created_by?.toString() !== user?._id?.toString()) {
+    throw new AppError("You are not allowed to view these submissions", 403);
+  }
+
+  const submissions = await SubmissionModel.find({
+    assignment: assignmentId,
+  })
+    .populate("student", "name email")
+    .sort({ submittedAt: -1 });
+
+  return submissions;
+}
+
 module.exports = {
   submitAssignmentService,
+  getSubmissionsByAssignmentService,
 };

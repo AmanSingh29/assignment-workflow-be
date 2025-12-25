@@ -9,6 +9,13 @@ const submitAssignmentValidator = celebrate({
   }),
 });
 
+const getSubmissionsByAssignmentValidator = celebrate({
+  [Segments.PARAMS]: Joi.object({
+    assignmentId: Joi.string().hex().length(24).required(),
+  }),
+});
+
 module.exports = {
   submitAssignmentValidator,
+  getSubmissionsByAssignmentValidator,
 };
