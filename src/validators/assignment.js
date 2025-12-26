@@ -30,8 +30,28 @@ const listAssignmentsValidator = celebrate({
   }),
 });
 
+const updateAssignmentValidator = celebrate({
+  [Segments.PARAMS]: Joi.object({
+    id: Joi.string().hex().length(24).required(),
+  }),
+
+  [Segments.BODY]: Joi.object({
+    title: Joi.string().min(3).max(200),
+    description: Joi.string().min(5),
+    due_date: Joi.date(),
+  }).min(1),
+});
+
+const deleteAssignmentValidator = celebrate({
+  [Segments.PARAMS]: Joi.object({
+    id: Joi.string().hex().length(24).required(),
+  }),
+});
+
 module.exports = {
   createAssignmentValidator,
   publishAssignmentValidator,
   listAssignmentsValidator,
+  updateAssignmentValidator,
+  deleteAssignmentValidator,
 };

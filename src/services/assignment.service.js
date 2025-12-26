@@ -1,5 +1,6 @@
 const { ASSIGNMENT_STATUS, SORT_ORDER, USER_ROLES } = require("../constants");
 const { AssignmentModel } = require("../models");
+const { AppError } = require("../utils/appError");
 
 async function createAssignmentService({ title, description, due_date, user }) {
   const assignment = await AssignmentModel.create({
@@ -76,8 +77,38 @@ async function listAssignmentsService({
   };
 }
 
+async function updateAssignmentService({ assignmentId, data, user }) {
+  const assignment = await AssignmentModel.findOneAndUpdate(
+    {
+      _id: assignmentId,
+      created_by: user?._id,
+      status: ASSIGNMENT_STATUS.DRAFT,
+    },
+    { $set: data },
+    { new: true }
+  );
+
+  if (!assignment) throw new AppError("Assignment not found!", 404);
+
+  return assignment;
+}
+
+async function deleteAssignmentService({ assignmentId, user }) {
+  const assignment = await AssignmentModel.findOneAndDelete({
+    _id: assignmentId,
+    created_by: user?._id,
+    status: ASSIGNMENT_STATUS.DRAFT,
+  });
+  if (!assignment) {
+    throw new AppError("Assignment not found", 404);
+  }
+  return true;
+}
+
 module.exports = {
   createAssignmentService,
   publishAssignmentService,
   listAssignmentsService,
+  updateAssignmentService,
+  deleteAssignmentService,
 };
