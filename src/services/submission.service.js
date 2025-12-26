@@ -53,7 +53,28 @@ async function getSubmissionsByAssignmentService({ assignmentId, user }) {
   return submissions;
 }
 
+async function markSubmissionReviewedService({ submissionId, user }) {
+  const submission = await SubmissionModel.findById(submissionId).populate(
+    "assignment"
+  );
+
+  if (!submission) {
+    throw new AppError("Submission not found", 404);
+  }
+
+  if (submission.assignment.created_by.toString() !== user._id.toString()) {
+    throw new AppError("You are not allowed to review this submission", 403);
+  }
+
+  await SubmissionModel.findByIdAndUpdate(submission._id, {
+    $set: { reviewed: true },
+  });
+
+  return submission;
+}
+
 module.exports = {
   submitAssignmentService,
   getSubmissionsByAssignmentService,
+  markSubmissionReviewedService,
 };

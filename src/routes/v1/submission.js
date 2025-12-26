@@ -7,10 +7,12 @@ const { USER_ROLES } = require("../../constants");
 const {
   submitAssignment,
   getSubmissionsByAssignment,
+  markSubmissionReviewed,
 } = require("../../controllers/submission");
 const {
   submitAssignmentValidator,
   getSubmissionsByAssignmentValidator,
+  markReviewedValidator,
 } = require("../../validators/submission");
 const router = express.Router();
 
@@ -29,6 +31,15 @@ router.get(
   authorizeRoles(USER_ROLES.TEACHER),
   getSubmissionsByAssignmentValidator,
   asyncHandler(getSubmissionsByAssignment),
+  sendResponse
+);
+
+router.patch(
+  "/review/:id",
+  authenticateUser,
+  authorizeRoles(USER_ROLES.TEACHER),
+  markReviewedValidator,
+  asyncHandler(markSubmissionReviewed),
   sendResponse
 );
 

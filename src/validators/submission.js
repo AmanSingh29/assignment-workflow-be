@@ -15,7 +15,14 @@ const getSubmissionsByAssignmentValidator = celebrate({
   }),
 });
 
+const markReviewedValidator = celebrate({
+  [Segments.PARAMS]: Joi.object({
+    id: Joi.string().hex().length(24).required(),
+  }),
+});
+
 module.exports = {
   submitAssignmentValidator,
   getSubmissionsByAssignmentValidator,
+  markReviewedValidator,
 };
