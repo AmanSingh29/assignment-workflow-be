@@ -1,5 +1,6 @@
 const { ASSIGNMENT_STATUS } = require("../constants");
 const { AssignmentModel, SubmissionModel } = require("../models");
+const { AppError } = require("../utils/appError");
 
 async function submitAssignmentService({ assignmentId, answer, user }) {
   const assignment = await AssignmentModel.findById(assignmentId);
