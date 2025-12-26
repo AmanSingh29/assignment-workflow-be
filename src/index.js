@@ -2,10 +2,12 @@ const express = require("express");
 const { PORT } = require("./config");
 const { connectDB } = require("./config/db");
 const app = express();
+const cors = require("cors");
 const apiRoutes = require("./routes");
 const globalErrorHandlerMw = require("./middlewares/globalErrorHandler");
 
 app.use(express.json());
+app.use(cors());
 
 // DB connection
 connectDB();

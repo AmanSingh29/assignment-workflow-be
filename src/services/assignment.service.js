@@ -1,4 +1,4 @@
-const { ASSIGNMENT_STATUS, SORT_ORDER } = require("../constants");
+const { ASSIGNMENT_STATUS, SORT_ORDER, USER_ROLES } = require("../constants");
 const { AssignmentModel } = require("../models");
 
 async function createAssignmentService({ title, description, due_date, user }) {
@@ -42,7 +42,7 @@ async function listAssignmentsService({
   const query = {};
 
   if (user.role === USER_ROLES.TEACHER) {
-    query.createdBy = user._id;
+    query.created_by = user._id;
 
     if (status) {
       query.status = status;
