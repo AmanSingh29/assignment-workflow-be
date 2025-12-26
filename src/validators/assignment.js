@@ -26,7 +26,7 @@ const listAssignmentsValidator = celebrate({
     sortOrder: Joi.string()
       .valid(...Object.values(SORT_ORDER))
       .default(SORT_ORDER.DESCENDING),
-    search: Joi.string().min(3).max(50),
+    submittedOnly: Joi.boolean().default(false),
   }),
 });
 

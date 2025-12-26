@@ -60,7 +60,7 @@ router.patch(
 router.get(
   "/submissions/:id",
   authenticateUser,
-  authorizeRoles(USER_ROLES.TEACHER),
+  authorizeRoles(USER_ROLES.TEACHER, USER_ROLES.STUDENT),
   getAssignmentDetailsValidator,
   asyncHandler(getAssignmentWithSubmissions),
   sendResponse

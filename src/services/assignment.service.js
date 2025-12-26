@@ -38,41 +38,101 @@ async function listAssignmentsService({
   limit = 10,
   sortBy = "created_at",
   sortOrder = SORT_ORDER.DESCENDING,
-  search,
+  submittedOnly = false,
 }) {
-  const query = {};
+  const skip = (page - 1) * limit;
+  const sortDirection = sortOrder === SORT_ORDER.ASCENDING ? 1 : -1;
+
+  const matchStage = {};
 
   if (user.role === USER_ROLES.TEACHER) {
-    query.created_by = user._id;
+    matchStage.created_by = user._id;
 
     if (status) {
-      query.status = status;
-    }
-
-    if (search) {
-      query.title = { $regex: search, $options: "i" };
+      matchStage.status = status;
     }
   }
 
   if (user.role === USER_ROLES.STUDENT) {
-    query.status = ASSIGNMENT_STATUS.PUBLISHED;
+    matchStage.status = ASSIGNMENT_STATUS.PUBLISHED;
   }
 
-  const skip = (page - 1) * limit;
-  const sort = { [sortBy]: sortOrder === SORT_ORDER.ASCENDING ? 1 : -1 };
+  const pipeline = [
+    { $match: matchStage },
 
-  const [assignments, total] = await Promise.all([
-    AssignmentModel.find(query).sort(sort).skip(skip).limit(Number(limit)),
-    AssignmentModel.countDocuments(query),
-  ]);
+    {
+      $lookup: {
+        from: "submissions",
+        localField: "_id",
+        foreignField: "assignment",
+        as: "submissions",
+      },
+    },
+
+    {
+      $addFields: {
+        submissionCount:
+          user.role === USER_ROLES.TEACHER
+            ? { $size: "$submissions" }
+            : "$$REMOVE",
+
+        hasSubmitted:
+          user.role === USER_ROLES.STUDENT
+            ? {
+                $in: [
+                  user._id,
+                  {
+                    $map: {
+                      input: "$submissions",
+                      as: "s",
+                      in: "$$s.student",
+                    },
+                  },
+                ],
+              }
+            : "$$REMOVE",
+      },
+    },
+  ];
+
+  if (user.role === USER_ROLES.STUDENT && submittedOnly) {
+    pipeline.push({
+      $match: {
+        hasSubmitted: true,
+      },
+    });
+  }
+
+  pipeline.push(
+    { $sort: { [sortBy]: sortDirection } },
+    {
+      $facet: {
+        data: [
+          { $skip: skip },
+          { $limit: Number(limit) },
+          {
+            $project: {
+              submissions: 0,
+            },
+          },
+        ],
+        totalCount: [{ $count: "count" }],
+      },
+    }
+  );
+
+  const result = await AssignmentModel.aggregate(pipeline);
+
+  const assignments = result[0].data;
+  const totalRecords = result[0].totalCount[0]?.count || 0;
 
   return {
     assignments,
     pagination: {
       page: Number(page),
       limit: Number(limit),
-      totalPages: Math.ceil(total / limit),
-      totalRecords: total,
+      totalPages: Math.ceil(totalRecords / limit),
+      totalRecords,
     },
   };
 }
@@ -108,15 +168,21 @@ async function deleteAssignmentService({ assignmentId, user }) {
 async function getAssignmentWithSubmissionsService({ assignmentId, user }) {
   const assignment = await AssignmentModel.findOne({
     _id: assignmentId,
-    created_by: user?._id,
   });
   if (!assignment) {
     throw new AppError("Assignment not found", 404);
   }
 
-  const submissions = await SubmissionModel.find({
+  const filter = {
     assignment: assignmentId,
-  })
+  };
+  if (
+    user.role == !USER_ROLES.TEACHER ||
+    user?._id?.toString() !== assignment?.created_by?.toString()
+  ) {
+    filter.student = user._id;
+  }
+  const submissions = await SubmissionModel.find(filter)
     .populate("student", "name email")
     .sort({ created_at: -1 });
 
