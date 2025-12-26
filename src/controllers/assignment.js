@@ -2,6 +2,7 @@ const {
   listAssignmentsService,
   updateAssignmentService,
   deleteAssignmentService,
+  getAssignmentWithSubmissionsService,
 } = require("../services/assignment.service");
 const { publishAssignmentService } = require("../services/assignment.service");
 const { createAssignmentService } = require("../services/assignment.service");
@@ -79,10 +80,27 @@ async function deleteAssignment(req, res, next) {
   next();
 }
 
+async function getAssignmentWithSubmissions(req, res, next) {
+  const data = await getAssignmentWithSubmissionsService({
+    assignmentId: req.params.id,
+    user: req.user,
+  });
+
+  res.data = {
+    statusCode: 200,
+    message: "Assignment details fetched successfully",
+    assignment: data.assignment,
+    submissions: data.submissions,
+  };
+
+  next();
+}
+
 module.exports = {
   createAssignment,
   publishAssignment,
   listAssignments,
   updateAssignment,
   deleteAssignment,
+  getAssignmentWithSubmissions,
 };

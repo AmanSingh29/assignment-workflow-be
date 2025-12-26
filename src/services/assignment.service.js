@@ -1,5 +1,5 @@
 const { ASSIGNMENT_STATUS, SORT_ORDER, USER_ROLES } = require("../constants");
-const { AssignmentModel } = require("../models");
+const { AssignmentModel, SubmissionModel } = require("../models");
 const { AppError } = require("../utils/appError");
 
 async function createAssignmentService({ title, description, due_date, user }) {
@@ -105,10 +105,32 @@ async function deleteAssignmentService({ assignmentId, user }) {
   return true;
 }
 
+async function getAssignmentWithSubmissionsService({ assignmentId, user }) {
+  const assignment = await AssignmentModel.findOne({
+    _id: assignmentId,
+    created_by: user?._id,
+  });
+  if (!assignment) {
+    throw new AppError("Assignment not found", 404);
+  }
+
+  const submissions = await SubmissionModel.find({
+    assignment: assignmentId,
+  })
+    .populate("student", "name email")
+    .sort({ created_at: -1 });
+
+  return {
+    assignment,
+    submissions,
+  };
+}
+
 module.exports = {
   createAssignmentService,
   publishAssignmentService,
   listAssignmentsService,
   updateAssignmentService,
   deleteAssignmentService,
+  getAssignmentWithSubmissionsService,
 };
