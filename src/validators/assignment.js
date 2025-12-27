@@ -17,7 +17,7 @@ const publishAssignmentValidator = celebrate({
 
 const listAssignmentsValidator = celebrate({
   [Segments.QUERY]: Joi.object({
-    status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS)),
+    status: Joi.string().valid(...Object.values(ASSIGNMENT_STATUS), ""),
     page: Joi.number().min(1).default(1),
     limit: Joi.number().min(1).max(100).default(10),
     sortBy: Joi.string()
