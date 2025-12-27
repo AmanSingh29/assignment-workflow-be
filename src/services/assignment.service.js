@@ -192,6 +192,23 @@ async function getAssignmentWithSubmissionsService({ assignmentId, user }) {
   };
 }
 
+async function markAssignmentCompletedService({ assignmentId, user }) {
+  const assignment = await AssignmentModel.findOneAndUpdate(
+    {
+      _id: assignmentId,
+      created_by: user?._id,
+      status: ASSIGNMENT_STATUS.PUBLISHED,
+    },
+    { $set: { status: ASSIGNMENT_STATUS.COMPLETED } },
+    { new: true }
+  );
+  if (!assignment) {
+    throw new AppError("Assignment not found", 404);
+  }
+
+  return assignment;
+}
+
 module.exports = {
   createAssignmentService,
   publishAssignmentService,
@@ -199,4 +216,5 @@ module.exports = {
   updateAssignmentService,
   deleteAssignmentService,
   getAssignmentWithSubmissionsService,
+  markAssignmentCompletedService,
 };

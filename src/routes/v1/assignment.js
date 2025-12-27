@@ -11,6 +11,7 @@ const {
   deleteAssignment,
   updateAssignment,
   getAssignmentWithSubmissions,
+  markAssignmentCompleted,
 } = require("../../controllers/assignment");
 const {
   createAssignmentValidator,
@@ -19,6 +20,7 @@ const {
   updateAssignmentValidator,
   deleteAssignmentValidator,
   getAssignmentDetailsValidator,
+  markAssignmentCompletedValidator,
 } = require("../../validators/assignment");
 const router = express.Router();
 
@@ -72,6 +74,15 @@ router.patch(
   authorizeRoles(USER_ROLES.TEACHER),
   publishAssignmentValidator,
   asyncHandler(publishAssignment),
+  sendResponse
+);
+
+router.patch(
+  "/complete/:id",
+  authenticateUser,
+  authorizeRoles(USER_ROLES.TEACHER),
+  markAssignmentCompletedValidator,
+  asyncHandler(markAssignmentCompleted),
   sendResponse
 );
 

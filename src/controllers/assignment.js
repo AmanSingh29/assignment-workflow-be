@@ -3,6 +3,7 @@ const {
   updateAssignmentService,
   deleteAssignmentService,
   getAssignmentWithSubmissionsService,
+  markAssignmentCompletedService,
 } = require("../services/assignment.service");
 const { publishAssignmentService } = require("../services/assignment.service");
 const { createAssignmentService } = require("../services/assignment.service");
@@ -96,6 +97,20 @@ async function getAssignmentWithSubmissions(req, res, next) {
   next();
 }
 
+async function markAssignmentCompleted(req, res, next) {
+  const assignment = await markAssignmentCompletedService({
+    assignmentId: req.params.id,
+    user: req.user,
+  });
+
+  res.data = {
+    statusCode: 200,
+    message: "Assignment marked as completed",
+    assignment,
+  };
+  next();
+}
+
 module.exports = {
   createAssignment,
   publishAssignment,
@@ -103,4 +118,5 @@ module.exports = {
   updateAssignment,
   deleteAssignment,
   getAssignmentWithSubmissions,
+  markAssignmentCompleted,
 };
