@@ -53,7 +53,7 @@ async function listAssignmentsService({
     }
   }
 
-  if (user.role === USER_ROLES.STUDENT) {
+  if (user.role === USER_ROLES.STUDENT && !submittedOnly) {
     matchStage.status = ASSIGNMENT_STATUS.PUBLISHED;
   }
 
